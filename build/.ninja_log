@@ -1,0 +1,5 @@
+# ninja log v7
+106	1906	8054807690686036	CMakeFiles/ChessIRL.dir/src/dashboard/Dashboard.cpp.obj	33cb4bc0f9296759
+74	1946	8054807690365057	CMakeFiles/ChessIRL.dir/src/main.cpp.obj	a44bc274608f6159
+90	2837	8054807690520708	CMakeFiles/ChessIRL.dir/src/core/App.cpp.obj	76baa7c93b78fd2
+2839	3214	8054807718012530	ChessIRL.exe	733f872b8d2a7086
