@@ -1,0 +1,227 @@
+CHESS GAME RULES AND SDL2/C++ IMPLEMENTATION SPECIFICATION
+
+1. BOARD AND INITIAL POSITION
+
+- The board contains 8 columns (files a-h) and 8 rows (ranks 1-8).
+- White begins on ranks 1 and 2. Black begins on ranks 8 and 7.
+- White's back rank from a1 to h1 is:
+  rook, knight, bishop, queen, king, bishop, knight, rook.
+- Black's back rank from a8 to h8 uses the same order.
+- White has eight pawns on rank 2. Black has eight pawns on rank 7.
+- The square at White's bottom-right (h1) is light.
+- White always makes the first move. Turns then alternate.
+
+Recommended array coordinates:
+- board[0][0] represents a8 and board[7][7] represents h1.
+- White pawns move toward decreasing row indexes.
+- Black pawns move toward increasing row indexes.
+
+2. GENERAL MOVE RULES
+
+- A player may move only a piece of their own color.
+- A piece cannot move onto a square occupied by another friendly piece.
+- Moving onto a square occupied by an enemy piece captures and removes it.
+- Except for knights, pieces cannot move through occupied squares.
+- Every move must leave the moving player's king safe. A move that leaves or
+  places that king in check is illegal.
+- The two kings may never occupy adjacent squares because each attacks the
+  squares surrounding it.
+
+3. PIECE MOVEMENT
+
+King:
+- Moves exactly one square horizontally, vertically, or diagonally.
+- Cannot move onto a square attacked by an enemy piece.
+- May castle when all castling requirements in section 5 are satisfied.
+
+Queen:
+- Moves any number of unobstructed squares horizontally, vertically, or
+  diagonally.
+
+Rook:
+- Moves any number of unobstructed squares horizontally or vertically.
+
+Bishop:
+- Moves any number of unobstructed squares diagonally.
+
+Knight:
+- Moves in an L shape: two squares along one axis and one along the other.
+- May jump over other pieces.
+
+Pawn:
+- Moves one empty square directly forward.
+- From its starting rank, it may move two squares forward if both squares are
+  empty.
+- Captures an enemy piece one square diagonally forward.
+- Cannot move backward or capture directly forward.
+- May capture en passant when all requirements in section 6 are satisfied.
+- Must promote when it reaches the last rank, as described in section 7.
+
+4. CHECK, CHECKMATE, AND STALEMATE
+
+- A king is in check if its square is attacked by at least one enemy piece.
+- A player in check must make a legal move that removes the check. This can be
+  done by moving the king, capturing the attacking piece, or blocking the
+  attack when the attacking piece is a sliding piece and blocking is possible.
+- A king is never captured.
+- Checkmate occurs when the current player's king is in check and that player
+  has no legal move. The checking player wins immediately.
+- Stalemate occurs when the current player's king is not in check but that
+  player has no legal move. The game is a draw.
+
+5. CASTLING
+
+Kingside castling:
+- White: king e1 to g1 and rook h1 to f1.
+- Black: king e8 to g8 and rook h8 to f8.
+
+Queenside castling:
+- White: king e1 to c1 and rook a1 to d1.
+- Black: king e8 to c8 and rook a8 to d8.
+
+Castling is legal only if:
+- The king has never moved.
+- The participating rook has never moved.
+- All squares between that king and rook are empty.
+- The king is not currently in check.
+- The square crossed by the king is not attacked.
+- The king's destination square is not attacked.
+
+The rook may pass through an attacked square. Castling rights are permanently
+lost when the king moves, or for a particular rook when that rook moves. A rook
+returning to its original square does not restore castling rights.
+
+6. EN PASSANT
+
+- When a pawn advances two squares from its starting rank and finishes beside
+  an enemy pawn, that enemy pawn may capture it as though it moved only one
+  square.
+- The capturing pawn moves diagonally forward into the square passed over by
+  the two-square pawn. The two-square pawn is removed.
+- En passant is available only on the immediately following move. Any other
+  move causes the opportunity to expire.
+- The capture is illegal if it would leave the capturing player's king in
+  check, including by exposing a rook, bishop, or queen line.
+
+7. PAWN PROMOTION
+
+- A White pawn reaching rank 8 or a Black pawn reaching rank 1 must immediately
+  be replaced by a queen, rook, bishop, or knight of the same color.
+- Promotion is mandatory and is not limited by the pieces already present.
+- The player may choose any of the four pieces; the pawn does not have to become
+  a queen.
+- A promotion may also capture a piece on the destination square.
+- The move is complete only after the promoted piece has been selected.
+
+8. DRAW RULES
+
+Automatic/game-state draw:
+- Stalemate.
+- Dead position: neither player can possibly checkmate by any legal sequence.
+  At minimum, detect these common cases:
+  * king versus king;
+  * king and one bishop versus king;
+  * king and one knight versus king;
+  * king and bishop versus king and bishop when all bishops are confined to
+    squares of the same color.
+
+Claim-based draw (recommended as a UI action):
+- Threefold repetition: the same position occurs at least three times, not
+  necessarily consecutively.
+- Fifty-move rule: each side has completed 50 moves (100 half-moves) without a
+  pawn move or capture.
+
+For strict modern FIDE behavior, also implement:
+- Automatic draw on fivefold repetition.
+- Automatic draw after 75 moves by each side (150 half-moves) without a pawn
+  move or capture, unless the last move gives checkmate.
+
+A position is the same for repetition only when all of these match:
+- Placement and color of every piece.
+- Side to move.
+- Available castling rights.
+- A currently available en-passant capture opportunity.
+
+Optional agreed draw:
+- If multiplayer controls support offers, a player may offer a draw and the
+  opponent may accept it.
+
+9. GAME END CONDITIONS
+
+The game ends when one of the following occurs:
+- Checkmate: the checkmating player wins.
+- Stalemate or another draw condition: the game is drawn.
+- Resignation: the opponent wins.
+- Time expiration, if clocks are enabled: the opponent normally wins, except
+  the result is a draw if the opponent cannot possibly checkmate.
+
+10. REQUIRED GAME STATE
+
+Store at least:
+- The piece type and color on every square.
+- The side whose turn it is.
+- Four castling-right flags: White/Black kingside and queenside.
+- The en-passant target square, or no target.
+- The half-move clock for the fifty/75-move rules.
+- The full-move number, incremented after each Black move.
+- Position-history keys/counts for repetition detection.
+- The selected square and generated legal destinations for the SDL2 UI.
+- The game status: playing, check, checkmate, stalemate, draw, resigned, or
+  timed out.
+- Promotion-pending state and the pawn's destination square.
+
+11. MOVE VALIDATION PIPELINE
+
+For every attempted move:
+1. Confirm the game is still active.
+2. Confirm the source and destination are valid board squares.
+3. Confirm the source contains a piece belonging to the side to move.
+4. Generate or validate the piece's movement pattern.
+5. Confirm its path is clear when it is not a knight.
+6. Apply special requirements for castling, en passant, or promotion.
+7. Apply the move to a temporary board, including any special capture or rook
+   movement.
+8. Reject the move if the moving side's king is attacked on the temporary board.
+9. Commit the move, update all state fields, and switch the side to move.
+10. Generate the new side's legal moves and determine check, checkmate,
+    stalemate, or another draw condition.
+
+Important implementation rule:
+- Generate pseudo-legal moves from piece movement first, then filter them by
+  simulating each move and rejecting every move that leaves the friendly king
+  attacked. Do not rely only on whether a piece is pinned or whether the king
+  was already in check.
+
+12. SDL2 INPUT AND DISPLAY BEHAVIOR
+
+- Convert mouse coordinates to board coordinates only when the click is inside
+  the board rectangle.
+- First valid click selects a piece belonging to the current player.
+- Display only fully legal destination squares for the selected piece.
+- Clicking a legal destination performs the move.
+- Clicking another friendly piece changes the selection.
+- Clicking outside the board or pressing Escape may clear the selection.
+- During promotion, block normal board input and display four promotion choices.
+- Visually distinguish the selected square, legal moves, last move, checked
+  king, and captured-piece destinations.
+- Once the game ends, reject further board moves but allow restart, quit, and
+  review controls.
+
+13. RECOMMENDED CORE TYPES
+
+- enum class Color { White, Black };
+- enum class PieceType { None, Pawn, Knight, Bishop, Rook, Queen, King };
+- struct Piece { PieceType type; Color color; };
+- struct Square { int row; int col; };
+- struct Move {
+    Square from;
+    Square to;
+    PieceType promotion;
+    bool isCastle;
+    bool isEnPassant;
+  };
+
+Keep chess logic independent from SDL2 rendering. The rules engine should accept
+a game state and move, report whether the move is legal, and return the updated
+state. SDL2 should handle windows, textures, input, animation, sound, and drawing,
+but should not decide whether a chess move is legal.
