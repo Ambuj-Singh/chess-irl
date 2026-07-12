@@ -2,6 +2,8 @@
 
 #include <SDL3/SDL.h>
 
+#include "chess-game/renderer/ChessRenderer.hpp"
+
 enum class AppScreen {
     Dashboard,
     Chess,
@@ -25,11 +27,15 @@ private:
     void render();
     void shutdown();
 
-    void renderChessPlaceholder();
+    bool backButtonClicked(const SDL_Event& event) const;
+    SDL_FRect backButtonRect() const;
+    void renderBackButton() const;
+
     void renderLudoPlaceholder();
 
     SDL_Window* window_ = nullptr;
     SDL_Renderer* renderer_ = nullptr;
+    ChessRenderer chessRenderer_;
 
     AppScreen currentScreen_ = AppScreen::Dashboard;
     bool running_ = false;

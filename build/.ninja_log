@@ -1,5 +1,19 @@
 # ninja log v7
-106	1906	8054807690686036	CMakeFiles/ChessIRL.dir/src/dashboard/Dashboard.cpp.obj	33cb4bc0f9296759
-74	1946	8054807690365057	CMakeFiles/ChessIRL.dir/src/main.cpp.obj	a44bc274608f6159
-90	2837	8054807690520708	CMakeFiles/ChessIRL.dir/src/core/App.cpp.obj	76baa7c93b78fd2
-2839	3214	8054807718012530	ChessIRL.exe	733f872b8d2a7086
+76	1859	8055719284333498	CMakeFiles/ChessIRL.dir/src/dashboard/Dashboard.cpp.obj	c3341ffd17b8a0c8
+59	1831	8055719284163262	CMakeFiles/ChessIRL.dir/src/main.cpp.obj	c1badc878ddc31c2
+67	2201	8055719284253326	CMakeFiles/ChessIRL.dir/src/core/App.cpp.obj	6435d2875e51e2fd
+2676	3035	8055719310330733	ChessIRL.exe	33ebea48ccc66c8b
+92	2676	8055719284498605	CMakeFiles/ChessIRL.dir/src/chess-game/renderer/ChessRenderer.cpp.obj	5b3f67e6894ad651
+83	1617	8055719284413405	CMakeFiles/ChessIRL.dir/src/chess-game/ChessGame.cpp.obj	2e1f8704b5b8eaa7
+82	705	8055719825106535	CMakeFiles/ChessGameTests.dir/tests/ChessGameTests.cpp.obj	69335de0efac7496
+91	1030	8055719825196682	CMakeFiles/ChessGameTests.dir/src/chess-game/ChessGame.cpp.obj	16023c3ce1232dda
+1030	1251	8055719834589642	ChessGameTests.exe	cbe7f2fdcadb2ca7
+43	2472	8055723548700944	CMakeFiles/ChessIRL.dir/src/chess-game/renderer/ChessRenderer.cpp.obj	5b3f67e6894ad651
+50	356	8055724131514858	ChessIRL.exe	33ebea48ccc66c8b
+67	2345	8055724954018926	CMakeFiles/ChessIRL.dir/src/chess-game/renderer/ChessRenderer.cpp.obj	5b3f67e6894ad651
+2346	2588	8055724976799673	ChessIRL.exe	33ebea48ccc66c8b
+31	1990	8055727599439061	CMakeFiles/ChessIRL.dir/src/dashboard/Dashboard.cpp.obj	c3341ffd17b8a0c8
+13	2042	8055727599259309	CMakeFiles/ChessIRL.dir/src/main.cpp.obj	c1badc878ddc31c2
+23	2492	8055727599359036	CMakeFiles/ChessIRL.dir/src/core/App.cpp.obj	6435d2875e51e2fd
+41	2796	8055727599529111	CMakeFiles/ChessIRL.dir/src/chess-game/renderer/ChessRenderer.cpp.obj	5b3f67e6894ad651
+2796	3086	8055727627079508	ChessIRL.exe	33ebea48ccc66c8b

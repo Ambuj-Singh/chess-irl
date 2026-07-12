@@ -43,6 +43,12 @@ bool App::initialize() {
     running_ = true;
     currentScreen_ = AppScreen::Dashboard;
 
+    if (!chessRenderer_.initialize(renderer_)) {
+        std::cerr << "Chess renderer initialization failed\n";
+        shutdown();
+        return false;
+    }
+
     return true;
 }
 
@@ -80,6 +86,14 @@ void App::handleEvents() {
             continue;
         }
 
+        if (
+            currentScreen_ != AppScreen::Dashboard &&
+            backButtonClicked(event)
+        ) {
+            currentScreen_ = AppScreen::Dashboard;
+            continue;
+        }
+
         switch (currentScreen_) {
             case AppScreen::Dashboard:
                 currentScreen_ =
@@ -87,7 +101,7 @@ void App::handleEvents() {
                 break;
 
             case AppScreen::Chess:
-                // Chess events will be forwarded here later.
+                chessRenderer_.handleEvent(event, renderer_);
                 break;
 
             case AppScreen::Ludo:
@@ -98,13 +112,9 @@ void App::handleEvents() {
 }
 
 void App::update() {
-    /*
-     * Game logic will be updated here later.
-     *
-     * Example:
-     * chessGame_.update();
-     * ludoGame_.update();
-     */
+    if (currentScreen_ == AppScreen::Chess) {
+        chessRenderer_.update();
+    }
 }
 
 void App::render() {
@@ -114,73 +124,90 @@ void App::render() {
             break;
 
         case AppScreen::Chess:
-            renderChessPlaceholder();
+            chessRenderer_.render(renderer_);
+            renderBackButton();
             break;
 
         case AppScreen::Ludo:
             renderLudoPlaceholder();
+            renderBackButton();
             break;
     }
 
     SDL_RenderPresent(renderer_);
 }
 
-void App::renderChessPlaceholder() {
-    SDL_SetRenderDrawColor(
-        renderer_,
-        18,
-        24,
-        22,
-        255
-    );
-
-    SDL_RenderClear(renderer_);
-
-    constexpr float boardSize = 560.0F;
-    constexpr float squareSize = boardSize / 8.0F;
-
-    const float boardX =
-        (WINDOW_WIDTH - boardSize) / 2.0F;
-
-    const float boardY =
-        (WINDOW_HEIGHT - boardSize) / 2.0F;
-
-    for (int row = 0; row < 8; ++row) {
-        for (int column = 0; column < 8; ++column) {
-            const bool isLight =
-                (row + column) % 2 == 0;
-
-            if (isLight) {
-                SDL_SetRenderDrawColor(
-                    renderer_,
-                    238,
-                    216,
-                    181,
-                    255
-                );
-            } else {
-                SDL_SetRenderDrawColor(
-                    renderer_,
-                    174,
-                    126,
-                    91,
-                    255
-                );
-            }
-
-            const SDL_FRect square{
-                boardX + column * squareSize,
-                boardY + row * squareSize,
-                squareSize,
-                squareSize
-            };
-
-            SDL_RenderFillRect(
-                renderer_,
-                &square
-            );
-        }
+bool App::backButtonClicked(const SDL_Event& event) const {
+    if (
+        event.type != SDL_EVENT_MOUSE_BUTTON_DOWN ||
+        event.button.button != SDL_BUTTON_LEFT
+    ) {
+        return false;
     }
+
+    const SDL_FRect button = backButtonRect();
+    return event.button.x >= button.x &&
+           event.button.x <= button.x + button.w &&
+           event.button.y >= button.y &&
+           event.button.y <= button.y + button.h;
+}
+
+SDL_FRect App::backButtonRect() const {
+    int width = 0;
+    int height = 0;
+    SDL_GetRenderOutputSize(renderer_, &width, &height);
+
+    const float margin = 20.0F;
+    const float buttonWidth = 92.0F;
+    const float buttonHeight = 46.0F;
+
+    return {
+        margin,
+        margin,
+        buttonWidth,
+        buttonHeight
+    };
+}
+
+void App::renderBackButton() const {
+    const SDL_FRect button = backButtonRect();
+
+    float mouseX = 0.0F;
+    float mouseY = 0.0F;
+    SDL_GetMouseState(&mouseX, &mouseY);
+
+    const bool hovered =
+        mouseX >= button.x &&
+        mouseX <= button.x + button.w &&
+        mouseY >= button.y &&
+        mouseY <= button.y + button.h;
+
+    if (hovered) {
+        SDL_SetRenderDrawColor(renderer_, 75, 84, 110, 255);
+    } else {
+        SDL_SetRenderDrawColor(renderer_, 42, 48, 65, 255);
+    }
+    SDL_RenderFillRect(renderer_, &button);
+
+    SDL_SetRenderDrawColor(renderer_, 177, 187, 220, 255);
+    SDL_RenderRect(renderer_, &button);
+
+    // Back arrow, drawn directly so the button does not require a font asset.
+    const float centerY = button.y + button.h / 2.0F;
+    const SDL_FRect shaft{
+        button.x + 30.0F,
+        centerY - 2.5F,
+        36.0F,
+        5.0F
+    };
+    SDL_RenderFillRect(renderer_, &shaft);
+
+    SDL_Vertex arrow[] = {
+        {{button.x + 20.0F, centerY}, {177, 187, 220, 255}, {0.0F, 0.0F}},
+        {{button.x + 34.0F, centerY - 12.0F}, {177, 187, 220, 255}, {0.0F, 0.0F}},
+        {{button.x + 34.0F, centerY + 12.0F}, {177, 187, 220, 255}, {0.0F, 0.0F}}
+    };
+    SDL_RenderGeometry(renderer_, nullptr, arrow, 3, nullptr, 0);
 }
 
 void App::renderLudoPlaceholder() {
@@ -216,6 +243,8 @@ void App::renderLudoPlaceholder() {
 }
 
 void App::shutdown() {
+    chessRenderer_.shutdown();
+
     if (renderer_ != nullptr) {
         SDL_DestroyRenderer(renderer_);
         renderer_ = nullptr;

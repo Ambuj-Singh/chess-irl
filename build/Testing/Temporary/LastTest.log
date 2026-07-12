@@ -1,0 +1,18 @@
+Start testing: Jul 12 20:49 India Standard Time
+----------------------------------------------------------
+1/1 Testing: chess_rules
+1/1 Test: chess_rules
+Command: "G:/Projects/chess-irl/build/ChessGameTests.exe"
+Directory: G:/Projects/chess-irl/build
+"chess_rules" start time: Jul 12 20:49 India Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"chess_rules" end time: Jul 12 20:49 India Standard Time
+"chess_rules" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jul 12 20:49 India Standard Time
